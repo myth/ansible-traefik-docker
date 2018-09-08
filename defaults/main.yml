@@ -25,3 +25,9 @@ traefik_docker_expose_by_default: false
 traefik_acme_enable: true
 traefik_acme_autocreate_from_host: true
 traefik_acme_email: "admin@mydomain.org"
+
+# Consul Key-Value backend
+traefik_consul_enable: false
+traefik_consul_endpoint: "127.0.0.1:8500"
+traefik_consul_prefix: "traefik"
+traefik_consul_watch: true
