@@ -6,4 +6,5 @@
 - name: restart traefik
   docker_service:
     state: present
+    project_src: "{{ traefik_directory }}"
     restarted: yes
