@@ -1,0 +1,27 @@
+---
+traefik_version: "latest"
+traefik_directory: "/opt/traefik"
+
+traefik_debug_enable: false
+traefik_log_level: "WARNING"
+
+# Main configuration
+traefik_entrypoint_http_port: 80
+traefik_entrypoint_http_redirect_to_https: true
+traefik_entrypoint_https_port: 443
+
+# Dashboard
+traefik_dashboard_enable: true
+traefik_dashboard_entrypoint_port: 8080
+traefik_dashboard_subdomain: "traefik"
+traefik_dashboard_basicauth_enable: true
+traefik_dashboard_basicauth_users: []
+
+# Docker
+traefik_docker_domain: "mydomain.org"
+traefik_docker_expose_by_default: false
+
+# Enable automatic certificates from Let's Encrypt
+traefik_acme_enable: true
+traefik_acme_autocreate_from_host: true
+traefik_acme_email: "admin@mydomain.org"

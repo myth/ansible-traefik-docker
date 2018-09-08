@@ -1,0 +1,34 @@
+# {{ ansible_managed }}
+version: '2'
+
+services:
+  traefik:
+    image: traefik
+    ports:
+      - "{{ traefik_entrypoint_http_port }}:80"
+      - "{{ traefik_entrypoint_https_port }}:443"
+{% if traefik_dashboard_enable %}
+    expose:
+      - {{ traefik_dashboard_entrypoint_port }}
+{% endif %}
+    networks:
+      - traefik
+{% if traefik_dashboard_enable %}
+    labels:
+      - "traefik.port={{ traefik_dashboard_entrypoint_port }}"
+      - "traefik.docker.network=traefik"
+      - "traefik.backend=traefik"
+      - "traefik.frontend.rule=Host:traefik.{{ traefik_docker_domain }}"
+      - "traefik.enable=true"
+{% endif %}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - {{ traefik_directory }}/traefik.toml:/traefik.toml
+{% if traefik_acme_enable %}
+      - {{ traefik_directory }}/acme.json:/acme.json
+{% endif %}
+    container_name: traefik
+
+networks:
+  traefik:
+    external: true

@@ -1,0 +1,9 @@
+---
+- name: start traefik
+  docker_service:
+    state: present
+
+- name: restart traefik
+  docker_service:
+    state: present
+    restarted: yes

@@ -1,0 +1,30 @@
+---
+- name: Render traefik config
+  template:
+    src: traefik.toml.j2
+    dest: "{{ traefik_directory }}/traefik.toml"
+  notify: restart traefik
+
+- name: Render docker-compose config
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ traefik_directory }}/docker-compose.yml"
+  notify: start traefik
+
+- name: Ensure acme config
+  file:
+    path: "{{ traefik_directory }}/acme.json"
+    state: touch
+    mode: 0600
+  when: traefik_acme_enable
+
+- name: Create traefik docker network
+  docker_network:
+    name: traefik
+    state: present
+
+- name: Pull Docker image
+  docker_image:
+    name: traefik
+    tag: "{{ traefik_version }}"
+  notify: start traefik
