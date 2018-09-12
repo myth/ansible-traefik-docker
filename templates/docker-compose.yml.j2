@@ -24,6 +24,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - {{ traefik_directory }}/traefik.toml:/traefik.toml
+      - {{ traefik_directory }}/conf.d:/conf.d
 {% if traefik_acme_enable %}
       - {{ traefik_directory }}/acme.json:/acme.json
 {% endif %}

@@ -31,7 +31,7 @@ entryPoint = "traefik"
 {% endif %}
 
 [file]
-directory = "{{ traefik_directory }}/conf.d/"
+directory = "/conf.d"
 watch = true
 
 {% if traefik_docker_enable %}
