@@ -18,6 +18,7 @@ traefik_dashboard_basicauth_enable: true
 traefik_dashboard_basicauth_users: []
 
 # Docker
+traefik_docker_enable: true
 traefik_docker_domain: "mydomain.org"
 traefik_docker_expose_by_default: false
 

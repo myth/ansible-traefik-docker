@@ -15,7 +15,10 @@
     - docker
     - docker-compose
 
-- name: Create directory
+- name: Create directories
   file:
-    path: "{{ traefik_directory }}"
+    path: "{{ item }}"
     state: directory
+    with_items:
+      - "{{ traefik_directory }}"
+      - "{{ traefik_directory }}/conf.d"
