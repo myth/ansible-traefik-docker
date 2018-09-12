@@ -19,6 +19,6 @@
   file:
     path: "{{ item }}"
     state: directory
-    with_items:
-      - "{{ traefik_directory }}"
-      - "{{ traefik_directory }}/conf.d"
+  with_items:
+    - "{{ traefik_directory }}"
+    - "{{ traefik_directory }}/conf.d"
