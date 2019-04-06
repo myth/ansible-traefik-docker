@@ -3,7 +3,7 @@ version: '2'
 
 services:
   traefik:
-    image: "traefik:{{ traefik_version }}"
+    image: traefik:{{ traefik_version }}
     ports:
       - "{{ traefik_entrypoint_http_port }}:80"
       - "{{ traefik_entrypoint_https_port }}:443"
