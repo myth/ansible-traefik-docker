@@ -12,8 +12,6 @@
 [entryPoints.https]
   address = ":{{ traefik_port_https }}"
 
-  [entryPoints.https.tls]
-
 # Dashboard
 
 {% if traefik_dashboard_enable %}
@@ -32,49 +30,11 @@
   exposedByDefault = {{ traefik_docker_expose_by_default | lower }}
 {% endif %}
 
-# Routers
-
-[http.routers]
-  {% if traefik_global_https_redirect %} 
-  [http.routers.httpCatchAll]
-    entryPoints = ["http"]
-    middlewares = ["httpsRedirect"]
-    rule = "HostRegexp(`{host:.+}`)"
-    service = "noop"
-{% endif %}
-{% if traefik_dashboard_enable %}
-  [http.routers.dashboad]
-    rule = "Host(`{{ traefik_dashboard_subdomain }}.{{ traefik_domain }}`)"
-    service = "api@internal"
-    middlewares = "dashboardAuth"
-{% endif %}
-
-# Services
-
-[http.services]
-{% if traefik_global_https_redirect %}
-  [http.services.noop.loadBalancer]
-    [[http.services.noop.loadBalancer.servers]]
-      url = "http://127.0.0.1"
-{% endif %}
-
 # Certificate resolvers
 
 {% if traefik_acme_enable %}
 [certificateResolvers.letsencrypt.acme]
   email = "{{ traefik_acme_email }}"
   storage = "acme.json"
-
-  [certificatesResolvers.letsencrypt.acme.tlsChallenge]
-{% endif %}
-
-# Middlewares
-
-[http.middlewares]
-  [http.middlewares.httpsRedirect.redirectScheme]
-    scheme = "https"
-    permanent = true
-{% if traefik_dashboard_basicauth_enable %}
-  [http.middlewares.dashboardAuth.basicAuth]
-    users = [{% for htpasswd in traefik_dashboard_basicauth_users %}"{{ htpasswd }}"{{ "," if not loop.last else "" }}{% endfor %}]
+  [certificatesResolvers.le.acme.tlsChallenge]
 {% endif %}

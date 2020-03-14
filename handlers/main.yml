@@ -1,11 +1,11 @@
 ---
 - name: start traefik
-  docker_service:
+  docker_compose:
     state: present
     project_src: "{{ traefik_directory }}"
 
 - name: restart traefik
-  docker_service:
+  docker_compose:
     state: present
     project_src: "{{ traefik_directory }}"
     restarted: yes

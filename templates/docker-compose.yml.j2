@@ -5,16 +5,33 @@ services:
   traefik:
     image: traefik:{{ traefik_version }}
     ports:
-      - "{{ traefik_port_http }}:80"
-      - "{{ traefik_port_https }}:443"
+      - {{ traefik_port_http }}:80
+      - {{ traefik_port_https }}:443
     networks:
       - {{ traefik_docker_network }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`{{ traefik_dashboard_subdomain }}.{{ traefik_domain }}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=le"
+{% if traefik_dashboard_basicauth_enable %}
+      - "traefik.http.routers.dashboard.middlewares=dashboardAuth"
+      - "traefik.http.middlewares.dashboardAuth.basicauth.users={% for htpasswd in traefik_dashboard_basicauth_users %}{{ htpasswd }}{{ "," if not loop.last else "" }}{% endfor %}"
+{% endif %}
+{% if traefik_global_https_redirect %}
+      - "traefik.http.routers.httpCatchall.rule=HostRegexp(`{any:.+}`)"
+      - "traefik.http.routers.httpCatchall.entrypoints=http"
+      - "traefik.http.routers.httpCatchall.middlewares=httpsRedirect"
+      - "traefik.http.middlewares.httpsRedirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.httpsRedirect.redirectscheme.permanent=true"
+{% endif %}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - {{ traefik_directory }}/traefik.toml:/traefik.toml
-      - {{ traefik_directory }}/conf.d:/conf.d
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "{{ traefik_directory }}/traefik.toml:/traefik.toml"
+      - "{{ traefik_directory }}/conf.d:/conf.d"
 {% if traefik_acme_enable %}
-      - {{ traefik_directory }}/acme.json:/acme.json
+      - "{{ traefik_directory }}/acme.json:/acme.json"
 {% endif %}
     container_name: traefik
 

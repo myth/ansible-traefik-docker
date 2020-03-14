@@ -11,12 +11,18 @@
     dest: "{{ traefik_directory }}/docker-compose.yml"
   notify: start traefik
 
+- name: Check that acme.json exists
+  stat:
+    path: "{{ traefik_directory }}/acme.json"
+  when: traefik_acme_enable
+  register: acme
+
 - name: Ensure acme config
   file:
     path: "{{ traefik_directory }}/acme.json"
     state: touch
     mode: 0600
-  when: traefik_acme_enable
+  when: acme.stat.exists == False
 
 - name: Create traefik docker network
   docker_network:
@@ -26,5 +32,6 @@
 - name: Pull Docker image
   docker_image:
     name: traefik
+    source: pull
     tag: "{{ traefik_version }}"
   notify: start traefik
