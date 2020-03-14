@@ -11,6 +11,7 @@ services:
       - {{ traefik_docker_network }}
     labels:
       - "traefik.enable=true"
+{% if traefik_dashboard_enable %}
       - "traefik.http.routers.dashboard.rule=Host(`{{ traefik_dashboard_subdomain }}.{{ traefik_domain }}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls=true"
@@ -18,6 +19,7 @@ services:
 {% if traefik_dashboard_basicauth_enable %}
       - "traefik.http.routers.dashboard.middlewares=dashboardAuth"
       - "traefik.http.middlewares.dashboardAuth.basicauth.users={% for htpasswd in traefik_dashboard_basicauth_users %}{{ htpasswd }}{{ "," if not loop.last else "" }}{% endfor %}"
+{% endif %}
 {% endif %}
 {% if traefik_global_https_redirect %}
       - "traefik.http.routers.httpCatchall.rule=HostRegexp(`{any:.+}`)"
