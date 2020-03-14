@@ -4,6 +4,7 @@ version: '2'
 services:
   traefik:
     image: traefik:{{ traefik_version }}
+    restart: unless-stopped
     ports:
       - {{ traefik_port_http }}:80
       - {{ traefik_port_https }}:443
