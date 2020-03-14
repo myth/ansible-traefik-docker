@@ -5,6 +5,10 @@
 [log]
   level = "{{ traefik_log_level }}"
 
+{% if traefik_accesslog_enable %}
+[accessLog]
+{% endif %}
+
 # Entrypoints
 
 [entryPoints.http]

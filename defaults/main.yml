@@ -4,8 +4,9 @@ traefik_version: "latest"
 traefik_directory: "/opt/traefik"
 
 # General settings
-traefik_log_level: "WARNING"
 traefik_domain: "mydomain.org"
+traefik_log_level: "WARNING"
+traefik_accesslog_enable: true
 
 # Main configuration
 traefik_global_https_redirect: true
