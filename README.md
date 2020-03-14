@@ -17,5 +17,5 @@ Create a playbook (`traefik.yml`) from this role:
     - role: roles/traefik
       traefik_domain: "mydomain.org"
       traefik_acme_email: "user@mydomain.org"
-      traefik_dashboard_basicauth_users: ["user:$apr1$somehash"]
+      traefik_dashboard_basicauth_users: ["user:$$apr1$$somehash"]
 ```
