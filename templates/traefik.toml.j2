@@ -1,60 +1,80 @@
 # {{ ansible_managed }}
-debug = {{ traefik_debug_enable | lower }}
 
-logLevel = "{{ traefik_log_level }}"
-defaultEntryPoints = ["https","http"]
+# General
 
-[entryPoints]
-  [entryPoints.http]
-  address = ":{{ traefik_entrypoint_http_port }}"
-{% if traefik_entrypoint_http_redirect_to_https %}
-    [entryPoints.http.redirect]
-{% endif %}
-    entryPoint = "https"
-  [entryPoints.https]
-  address = ":{{ traefik_entrypoint_https_port }}"
-    [entryPoints.https.tls]
-{% if traefik_dashboard_enable %}
-  [entryPoints.traefik]
-  address = ":{{ traefik_dashboard_entrypoint_port }}"
-{% if traefik_dashboard_basicauth_enable %}
-    [entryPoints.traefik.auth.basic]
-    users = [{% for htpasswd in traefik_dashboard_basicauth_users %}"{{ htpasswd }}"{{ "," if not loop.last else "" }}{% endfor %}]
-{% endif %}
-{% endif %}
+[log]
+  level = "{{ traefik_log_level }}"
 
-[retry]
+# Entrypoints
+
+[entryPoints.http]
+  address = ":{{ traefik_port_http }}"
+[entryPoints.https]
+  address = ":{{ traefik_port_https }}"
+
+  [entryPoints.https.tls]
+
+# Dashboard
 
 {% if traefik_dashboard_enable %}
 [api]
-entryPoint = "traefik"
+  dashboard = true
 {% endif %}
 
-[file]
-directory = "/conf.d"
-watch = true
+# Dynamic configuration providers
 
+[providers.file]
+  directory = "/conf.d"
 {% if traefik_docker_enable %}
-[docker]
-endpoint = "unix:///var/run/docker.sock"
-domain = "{{ traefik_docker_domain }}"
-watch = true
-exposedByDefault = {{ traefik_docker_expose_by_default | lower }}
+[providers.docker]
+  endpoint = "unix:///var/run/docker.sock"
+  network = "traefik"
+  exposedByDefault = {{ traefik_docker_expose_by_default | lower }}
 {% endif %}
+
+# Routers
+
+[http.routers]
+  {% if traefik_global_https_redirect %} 
+  [http.routers.httpCatchAll]
+    entryPoints = ["http"]
+    middlewares = ["httpsRedirect"]
+    rule = "HostRegexp(`{host:.+}`)"
+    service = "noop"
+{% endif %}
+{% if traefik_dashboard_enable %}
+  [http.routers.dashboad]
+    rule = "Host(`{{ traefik_dashboard_subdomain }}.{{ traefik_domain }}`)"
+    service = "api@internal"
+    middlewares = "dashboardAuth"
+{% endif %}
+
+# Services
+
+[http.services]
+{% if traefik_global_https_redirect %}
+  [http.services.noop.loadBalancer]
+    [[http.services.noop.loadBalancer.servers]]
+      url = "http://127.0.0.1"
+{% endif %}
+
+# Certificate resolvers
 
 {% if traefik_acme_enable %}
-[acme]
-email = "{{ traefik_acme_email }}"
-storage = "acme.json"
-entryPoint = "https"
-onHostRule = {{ traefik_acme_autocreate_from_host | lower }}
-[acme.httpChallenge]
-entryPoint = "http"
+[certificateResolvers.letsencrypt.acme]
+  email = "{{ traefik_acme_email }}"
+  storage = "acme.json"
+
+  [certificatesResolvers.letsencrypt.acme.tlsChallenge]
 {% endif %}
 
-{% if traefik_consul_enable %}
-[consul]
-endpoint = "{{ traefik_consul_endpoint }}"
-watch = {{ traefik_consul_watch | lower }}
-prefix = "{{ traefik_consul_prefix }}"
+# Middlewares
+
+[http.middlewares]
+  [http.middlewares.httpsRedirect.redirectScheme]
+    scheme = "https"
+    permanent = true
+{% if traefik_dashboard_basicauth_enable %}
+  [http.middlewares.dashboardAuth.basicAuth]
+    users = [{% for htpasswd in traefik_dashboard_basicauth_users %}"{{ htpasswd }}"{{ "," if not loop.last else "" }}{% endfor %}]
 {% endif %}
