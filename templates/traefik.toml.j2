@@ -33,7 +33,7 @@
 # Certificate resolvers
 
 {% if traefik_acme_enable %}
-[certificateResolvers.letsencrypt.acme]
+[certificateResolvers.le.acme]
   email = "{{ traefik_acme_email }}"
   storage = "acme.json"
   [certificatesResolvers.le.acme.tlsChallenge]
