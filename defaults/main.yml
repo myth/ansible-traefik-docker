@@ -6,7 +6,7 @@ traefik_directory: "/opt/traefik"
 # General settings
 traefik_domain: "mydomain.org"
 traefik_log_level: "WARNING"
-traefik_accesslog_enable: true
+traefik_accesslog_enable: false
 
 # Main configuration
 traefik_global_https_redirect: true
